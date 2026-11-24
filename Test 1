@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Crate Scanner — Vinyl & 78 Archive Tool</title>
+  <style>
+    :root {
+      --bg: #111317;
+      --card: #1a1d24;
+      --card-alt: #242933;
+      --border: #2e3440;
+      --accent: #f59e0b;
+      --accent-hover: #d97706;
+      --text: #f3f4f6;
+      --muted: #9ca3af;
+      --success: #10b981;
+      --danger: #ef4444;
+      --info: #3b82f6;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+    body { background: var(--bg); color: var(--text); padding: 14px; max-width: 520px; margin: 0 auto; line-height: 1.45; }
+    
+    header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; }
+    h1 { font-size: 1.25rem; font-weight: 700; letter-spacing: -0.3px; }
+    .badge { background: var(--card-alt); border: 1px solid var(--border); padding: 5px 10px; border-radius: 999px; font-size: 0.78rem; color: var(--muted); font-weight: 600; }
+
+    .tabs { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 14px; }
+    .tab-btn { background: var(--card-alt); color: var(--text); border: 1px solid var(--border); padding: 11px; border-radius: 10px; font-weight: 600; font-size: 0.9rem; cursor: pointer; transition: 0.15s; }
+    .tab-btn.active { background: var(--accent); color: #111; border-color: var(--accent); }
+
+    .panel { display: none; }
+    .panel.active { display: block; }
+
+    .viewport-wrap { position: relative; width: 100%; aspect-ratio: 1 / 1; background: #0a0b0e; border-radius: 14px; overflow: hidden; border: 1px solid var(--border); margin-bottom: 12px; display: flex; align-items: center; justify-content: center; }
+    video, #previewImg { width: 100%; height: 100%; object-fit: cover; display: block; }
+    #previewImg { display: none; }
+    .reticle { position: absolute; width: 72%; height: 72%; border: 2px dashed rgba(245, 158, 11, 0.75); border-radius: 50%; pointer-events: none; box-shadow: 0 0 0 9999px rgba(0,0,0,0.35); }
+    .reticle-center { position: absolute; width: 12%; height: 12%; border: 1px solid rgba(255,255,255,0.5); border-radius: 50%; pointer-events: none; }
+
+    .btn { width: 100%; padding: 13px; border-radius: 10px; border: none; font-size: 0.95rem; font-weight: 700; cursor: pointer; margin-bottom: 9px; display: flex; align-items: center; justify-content: center; gap: 8px; }
+    .btn-primary { background: var(--accent); color: #111; }
+    .btn-primary:disabled { opacity: 0.5; cursor: not-allowed; }
+    .btn-secondary { background: var(--card-alt); color: var(--text); border: 1px solid var(--border); }
+
+    .status { font-size: 0.85rem; padding: 10px 12px; border-radius: 8px; background: var(--card); border: 1px solid var(--border); color: var(--muted); margin-bottom: 12px; }
+    .status.error { border-color: var(--danger); color: #fca5a5; background: rgba(239, 68, 68, 0.12); }
+    .status.working { border-color: var(--accent); color: #fde68a; }
+    .status.ok { border-color: var(--success); color: #6ee7b7; }
+
+    .result-card { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 14px; margin-bottom: 14px; }
+    .card-top { display: flex; justify-content: space-between; align-items: center; gap: 8px; flex-wrap: wrap; margin-bottom: 10px; }
+    .match-pill { display: inline-block; padding: 4px 10px; border-radius: 6px; font-size: 0.75rem; font-weight: 800; letter-spacing: 0.4px; text-transform: uppercase; }
+    .pill-new { background: rgba(59, 130, 246, 0.2); color: #93c5fd; border: 1px solid rgba(59, 130, 246, 0.4); }
+    .pill-owned { background: rgba(16, 185, 129, 0.2); color: #6ee7b7; border: 1px solid rgba(16, 185, 129, 0.4); }
+    .pill-want { background: rgba(245, 158, 11, 0.2); color: #fcd34d; border: 1px solid rgba(245, 158, 11, 0.4); }
+
+    .community-pill { background: var(--card-alt); border: 1px solid var(--border); padding: 4px 9px; border-radius: 6px; font-size: 0.76rem; font-weight: 700; color: var(--text); }
+
+    .field { margin-bottom: 7px; font-size: 0.9rem; }
+    .field strong { color: var(--muted); display: inline-block; width: 122px; font-weight: 600; }
+
+    .link-btn { display: block; text-align: center; text-decoration: none; background: var(--card-alt); color: var(--text); border: 1px solid var(--border); padding: 11px; border-radius: 9px; font-weight: 600; font-size: 0.88rem; margin-top: 10px; }
+
+    .form-group { margin-bottom: 12px; }
+    label { display: block; font-size: 0.82rem; color: var(--muted); margin-bottom: 5px; font-weight: 600; }
+    input[type="text"], input[type="password"] { width: 100%; padding: 11px; border-radius: 9px; border: 1px solid var(--border); background: var(--card); color: var(--text); font-size: 0.92rem; }
+    canvas { display: none; }
+  </style>
+</head>
+<body>
+
+  <header>
+    <h1>Crate Scanner</h1>
+    <div class="badge" id="archiveBadge">Archive: 0 | Want: 0</div>
+  </header>
+
+  <div class="tabs">
+    <button class="tab-btn active" id="tabScan" onclick="switchTab('scan')">Scan Label</button>
+    <button class="tab-btn" id="tabKeys" onclick="switchTab('keys')">Archive Sync & Keys</button>
+  </div>
+
+  <div id="panelScan" class="panel active">
+    <div class="viewport-wrap">
+      <video id="video" autoplay playsinline muted></video>
+      <img id="previewImg" alt="Captured label" />
+      <div class="reticle" id="reticle"></div>
+      <div class="reticle-center" id="reticleCenter"></div>
+    </div>
+
+    <button class="btn btn-primary" id="snapBtn" onclick="handleSnapOrIdentify()">Snap & Identify Label</button>
+    <button class="btn btn-secondary" id="resetCamBtn" style="display:none;" onclick="resetToCamera()">Back to Live Camera</button>
+    <button class="btn btn-secondary" onclick="document.getElementById('fileInput').click()">Or Pick / Take Photo</button>
+    <input type="file" id="fileInput" accept="image/*" capture="environment" style="display:none;" onchange="handleFileUpload(event)" />
+
+    <div class="status" id="statusBox">Ready. Center a record label inside the circle and tap Snap.</div>
+
+    <div class="result-card">
+      <div class="card-top">
+        <div class="match-pill pill-new" id="matchPill">NEW TO ARCHIVE</div>
+        <div class="community-pill" id="communityPill">Have: — | Want: —</div>
+      </div>
+      <div class="field"><strong>Artist:</strong> <span id="resArtist">—</span></div>
+      <div class="field"><strong>Title:</strong> <span id="resTitle">—</span></div>
+      <div class="field"><strong>Label & Cat#:</strong> <span id="resLabel">—</span></div>
+      <div class="field"><strong>Format / Era:</strong> <span id="resFormat">—</span></div>
+      <div class="field"><strong>Discogs Stats:</strong> <span id="resCommunity">—</span></div>
+      <div class="field"><strong>Notes:</strong> <span id="resNotes">—</span></div>
+      <div class="field"><strong>Archive Match:</strong> <span id="resMatch">—</span></div>
+      <a href="https://discogs.com" target="_blank" rel="noopener" class="link-btn" id="discogsLink">Open Search on Discogs Web</a>
+    </div>
+  </div>
+
+  <div id="panelKeys" class="panel">
+    <div class="result-card">
+      <div class="form-group">
+        <label for="geminiKey">Free Gemini API Key (Google AI Studio)</label>
+        <input type="password" id="geminiKey" placeholder="AIzaSy..." />
+      </div>
+      <div class="form-group">
+        <label for="discogsUser">Discogs Username</label>
+        <input type="text" id="discogsUser" placeholder="e.g. vinylcollector78" />
+      </div>
+      <div class="form-group">
+        <label for="discogsToken">Discogs Personal Access Token (Recommended for Have/Want stats)</label>
+        <input type="password" id="discogsToken" placeholder="Paste Discogs Personal Access Token" />
+      </div>
+      <button class="btn btn-primary" onclick="saveKeys()">Save Keys</button>
+      <button class="btn btn-secondary" id="syncBtn" onclick="syncDiscogs()">Sync Full Discogs Collection & Wantlist</button>
+      <div class="status" id="syncStatus" style="margin-top:10px; margin-bottom:0;">Keys are stored locally on your phone only.</div>
+    </div>
+  </div>
+
+  <canvas id="canvas"></canvas>
+
+  <script>
+    const video = document.getElementById('video');
+    const previewImg = document.getElementById('previewImg');
+    const canvas = document.getElementById('canvas');
+    const snapBtn = document.getElementById('snapBtn');
+    const resetCamBtn = document.getElementById('resetCamBtn');
+    const reticle = document.getElementById('reticle');
+    const reticleCenter = document.getElementById('reticleCenter');
+    const statusBox = document.getElementById('statusBox');
+
+    let stream = null;
+    let cameraReady = false;
+    let currentImageBase64 = null;
+
+    let archiveData = JSON.parse(localStorage.getItem('crate_archive') || '{"collection":[],"wantlist":[]}');
+    updateBadge();
+
+    document.getElementById('geminiKey').value = localStorage.getItem('crate_gemini_key') || '';
+    document.getElementById('discogsUser').value = localStorage.getItem('crate_discogs_user') || '';
+    document.getElementById('discogsToken').value = localStorage.getItem('crate_discogs_token') || '';
+
+    function switchTab(tab) {
+      document.getElementById('tabScan').classList.toggle('active', tab === 'scan');
+      document.getElementById('tabKeys').classList.toggle('active', tab === 'keys');
+      document.getElementById('panelScan').classList.toggle('active', tab === 'scan');
+      document.getElementById('panelKeys').classList.toggle('active', tab === 'keys');
+    }
+
+    function setStatus(msg, type = '') {
+      statusBox.textContent = msg;
+      statusBox.className = 'status' + (type ? ' ' + type : '');
+    }
+
+    function updateBadge() {
+      const c = archiveData.collection ? archiveData.collection.length : 0;
