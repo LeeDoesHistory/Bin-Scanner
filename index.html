@@ -132,39 +132,37 @@
         <label class="field-lbl" for="discogsToken">Discogs Personal Access Token</label>
         <input type="password" id="discogsToken" placeholder="Paste Discogs Personal Access Token" />
       </div>
-      <button type="button" class="btn btn-primary" id="saveKeysBtn">Save Keys</button>
-      <button type="button" class="btn btn-secondary" id="syncBtn">Sync Full Discogs Collection & Wantlist</button>
-      <div class="status" id="syncStatus" style="margin-top:10px; margin-bottom:0;">Keys are stored locally on your phone only.</div>
+             <button type="button" class="btn btn-primary" id="saveKeysBtn" onclick="saveSettings()">Save Keys</button>
+        <button type="button" class="btn btn-secondary" id="syncBtn" onclick="syncDiscogsCollection()">Sync Full Discogs Collection &amp; Wantlist</button>
+        <div class="status" id="syncStatus" style="margin-top:10px; margin-bottom:0;">Keys are stored locally on your phone only.</div>
+      </div>
     </div>
-  </div>
 
-  <canvas id="canvas"></canvas>
+    <canvas id="canvas"></canvas>
 
-  <script>
-    var video = document.getElementById('video');
-    var previewImg = document.getElementById('previewImg');
-    var camPlaceholder = document.getElementById('camPlaceholder');
-    var canvas = document.getElementById('canvas');
-    var liveCamBtn = document.getElementById('liveCamBtn');
-    var snapBtn = document.getElementById('snapBtn');
-    var statusBox = document.getElementById('statusBox');
+    <script>
+      function saveSettings() {
+        const statusEl = document.getElementById("syncStatus");
+        const btn = document.getElementById("saveKeysBtn");
 
-    var stream = null;
-    var cameraReady = false;
-    var archiveData = { collection: [], wantlist: [] };
+        try {
+          const gKey = document.getElementById("geminiKey").value.trim();
+          const dUser = document.getElementById("discogsUser").value.trim();
+          const dTok = document.getElementById("discogsToken").value.trim();
 
-    try {
-      archiveData = JSON.parse(localStorage.getItem('crate_archive') || '{"collection":[],"wantlist":[]}');
-    } catch (e) {}
+          localStorage.setItem("cs_geminiKey", gKey);
+          localStorage.setItem("cs_discogsUser", dUser);
+          localStorage.setItem("cs_discogsToken", dTok);
 
-    function updateBadge() {
-      var c = archiveData.collection ? archiveData.collection.length : 0;
-      var w = archiveData.wantlist ? archiveData.wantlist.length : 0;
-      document.getElementById('archiveBadge').textContent = 'Archive: ' + c + ' | Want: ' + w;
-    }
+          statusEl.style.color = "#6ee7b7";
+          statusEl.textContent = "Saved! Keys are stored on your phone.";
 
-    updateBadge();
-
-    document.getElementById('geminiKey').value = localStorage.getItem('crate_gemini_key') || '';
-    document.getElementById('discogsUser').value = localStorage.getItem('crate_discogs_user') || '';
-    
+          if (btn) {
+            btn.textContent = "Saved ✓";
+            setTimeout(() => btn.textContent = "Save Keys", 1500);
+          }
+        } catch (err) {
+          statusEl.style.color = "#ef4444";
+          statusEl.textContent = "Save Error: " + err.message;
+        }
+      }
