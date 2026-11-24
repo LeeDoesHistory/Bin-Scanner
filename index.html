@@ -11,32 +11,36 @@
       --card-alt: #242933;
       --border: #2e3440;
       --accent: #f59e0b;
-      --accent-hover: #d97706;
       --text: #f3f4f6;
       --muted: #9ca3af;
       --success: #10b981;
       --danger: #ef4444;
-      --info: #3b82f6;
     }
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
     body { background: var(--bg); color: var(--text); padding: 14px; max-width: 520px; margin: 0 auto; line-height: 1.45; }
-    
     header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; }
-    h1 { font-size: 1.25rem; font-weight: 700; letter-spacing: -0.3px; }
+    h1 { font-size: 1.25rem; font-weight: 700; }
     .badge { background: var(--card-alt); border: 1px solid var(--border); padding: 5px 10px; border-radius: 999px; font-size: 0.78rem; color: var(--muted); font-weight: 600; }
 
+    /* Pure CSS Tabs - guaranteed to switch even without JS */
+    .tab-radio { display: none; }
     .tabs { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 14px; }
-    .tab-btn { background: var(--card-alt); color: var(--text); border: 1px solid var(--border); padding: 11px; border-radius: 10px; font-weight: 600; font-size: 0.9rem; cursor: pointer; transition: 0.15s; }
-    .tab-btn.active { background: var(--accent); color: #111; border-color: var(--accent); }
-
+    .tab-label { background: var(--card-alt); color: var(--text); border: 1px solid var(--border); padding: 12px; border-radius: 10px; font-weight: 700; font-size: 0.9rem; text-align: center; cursor: pointer; user-select: none; display: block; }
+    #radioScan:checked ~ .tabs label[for="radioScan"],
+    #radioKeys:checked ~ .tabs label[for="radioKeys"] {
+      background: var(--accent);
+      color: #111;
+      border-color: var(--accent);
+    }
     .panel { display: none; }
-    .panel.active { display: block; }
+    #radioScan:checked ~ #panelScan { display: block; }
+    #radioKeys:checked ~ #panelKeys { display: block; }
 
     .viewport-wrap { position: relative; width: 100%; aspect-ratio: 1 / 1; background: #0a0b0e; border-radius: 14px; overflow: hidden; border: 1px solid var(--border); margin-bottom: 12px; display: flex; align-items: center; justify-content: center; }
-    video, #previewImg { width: 100%; height: 100%; object-fit: cover; display: block; }
-    #previewImg { display: none; }
-    .reticle { position: absolute; width: 72%; height: 72%; border: 2px dashed rgba(245, 158, 11, 0.75); border-radius: 50%; pointer-events: none; box-shadow: 0 0 0 9999px rgba(0,0,0,0.35); }
-    .reticle-center { position: absolute; width: 12%; height: 12%; border: 1px solid rgba(255,255,255,0.5); border-radius: 50%; pointer-events: none; }
+    video, #previewImg { width: 100%; height: 100%; object-fit: cover; display: none; }
+    .placeholder-txt { color: var(--muted); font-size: 0.85rem; text-align: center; padding: 20px; z-index: 2; }
+    .reticle { position: absolute; width: 72%; height: 72%; border: 2px dashed rgba(245, 158, 11, 0.75); border-radius: 50%; pointer-events: none; }
+    .reticle-center { position: absolute; width: 12%; height: 12%; border: 1px solid rgba(255,255,255,0.4); border-radius: 50%; pointer-events: none; }
 
     .btn { width: 100%; padding: 13px; border-radius: 10px; border: none; font-size: 0.95rem; font-weight: 700; cursor: pointer; margin-bottom: 9px; display: flex; align-items: center; justify-content: center; gap: 8px; }
     .btn-primary { background: var(--accent); color: #111; }
@@ -50,20 +54,18 @@
 
     .result-card { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 14px; margin-bottom: 14px; }
     .card-top { display: flex; justify-content: space-between; align-items: center; gap: 8px; flex-wrap: wrap; margin-bottom: 10px; }
-    .match-pill { display: inline-block; padding: 4px 10px; border-radius: 6px; font-size: 0.75rem; font-weight: 800; letter-spacing: 0.4px; text-transform: uppercase; }
+    .match-pill { display: inline-block; padding: 4px 10px; border-radius: 6px; font-size: 0.75rem; font-weight: 800; text-transform: uppercase; }
     .pill-new { background: rgba(59, 130, 246, 0.2); color: #93c5fd; border: 1px solid rgba(59, 130, 246, 0.4); }
     .pill-owned { background: rgba(16, 185, 129, 0.2); color: #6ee7b7; border: 1px solid rgba(16, 185, 129, 0.4); }
     .pill-want { background: rgba(245, 158, 11, 0.2); color: #fcd34d; border: 1px solid rgba(245, 158, 11, 0.4); }
-
     .community-pill { background: var(--card-alt); border: 1px solid var(--border); padding: 4px 9px; border-radius: 6px; font-size: 0.76rem; font-weight: 700; color: var(--text); }
 
     .field { margin-bottom: 7px; font-size: 0.9rem; }
     .field strong { color: var(--muted); display: inline-block; width: 122px; font-weight: 600; }
-
     .link-btn { display: block; text-align: center; text-decoration: none; background: var(--card-alt); color: var(--text); border: 1px solid var(--border); padding: 11px; border-radius: 9px; font-weight: 600; font-size: 0.88rem; margin-top: 10px; }
 
     .form-group { margin-bottom: 12px; }
-    label { display: block; font-size: 0.82rem; color: var(--muted); margin-bottom: 5px; font-weight: 600; }
+    label.field-lbl { display: block; font-size: 0.82rem; color: var(--muted); margin-bottom: 5px; font-weight: 600; }
     input[type="text"], input[type="password"] { width: 100%; padding: 11px; border-radius: 9px; border: 1px solid var(--border); background: var(--card); color: var(--text); font-size: 0.92rem; }
     canvas { display: none; }
   </style>
@@ -75,25 +77,30 @@
     <div class="badge" id="archiveBadge">Archive: 0 | Want: 0</div>
   </header>
 
+  <input type="radio" name="navtabs" id="radioScan" class="tab-radio" checked />
+  <input type="radio" name="navtabs" id="radioKeys" class="tab-radio" />
+
   <div class="tabs">
-    <button class="tab-btn active" id="tabScan" onclick="switchTab('scan')">Scan Label</button>
-    <button class="tab-btn" id="tabKeys" onclick="switchTab('keys')">Archive Sync & Keys</button>
+    <label for="radioScan" class="tab-label">Scan Label</label>
+    <label for="radioKeys" class="tab-label">Archive Sync & Keys</label>
   </div>
 
-  <div id="panelScan" class="panel active">
+  <div id="panelScan" class="panel">
     <div class="viewport-wrap">
+      <div class="placeholder-txt" id="camPlaceholder">Tap "Take / Pick Record Photo" below for sharpest focus, or "Start Live Camera".</div>
       <video id="video" autoplay playsinline muted></video>
       <img id="previewImg" alt="Captured label" />
       <div class="reticle" id="reticle"></div>
       <div class="reticle-center" id="reticleCenter"></div>
     </div>
 
-    <button class="btn btn-primary" id="snapBtn" onclick="handleSnapOrIdentify()">Snap & Identify Label</button>
-    <button class="btn btn-secondary" id="resetCamBtn" style="display:none;" onclick="resetToCamera()">Back to Live Camera</button>
-    <button class="btn btn-secondary" onclick="document.getElementById('fileInput').click()">Or Pick / Take Photo</button>
-    <input type="file" id="fileInput" accept="image/*" capture="environment" style="display:none;" onchange="handleFileUpload(event)" />
+    <label for="fileInput" class="btn btn-primary" style="cursor:pointer;">Take / Pick Record Photo</label>
+    <input type="file" id="fileInput" accept="image/*" capture="environment" style="display:none;" />
 
-    <div class="status" id="statusBox">Ready. Center a record label inside the circle and tap Snap.</div>
+    <button type="button" class="btn btn-secondary" id="liveCamBtn">Start Live Camera</button>
+    <button type="button" class="btn btn-secondary" id="snapBtn" style="display:none;">Snap Frame & Identify</button>
+
+    <div class="status" id="statusBox">Ready. Tap "Archive Sync & Keys" above to add your free Gemini API key first.</div>
 
     <div class="result-card">
       <div class="card-top">
@@ -114,19 +121,19 @@
   <div id="panelKeys" class="panel">
     <div class="result-card">
       <div class="form-group">
-        <label for="geminiKey">Free Gemini API Key (Google AI Studio)</label>
+        <label class="field-lbl" for="geminiKey">Free Gemini API Key (Google AI Studio)</label>
         <input type="password" id="geminiKey" placeholder="AIzaSy..." />
       </div>
       <div class="form-group">
-        <label for="discogsUser">Discogs Username</label>
+        <label class="field-lbl" for="discogsUser">Discogs Username</label>
         <input type="text" id="discogsUser" placeholder="e.g. vinylcollector78" />
       </div>
       <div class="form-group">
-        <label for="discogsToken">Discogs Personal Access Token (Recommended for Have/Want stats)</label>
+        <label class="field-lbl" for="discogsToken">Discogs Personal Access Token</label>
         <input type="password" id="discogsToken" placeholder="Paste Discogs Personal Access Token" />
       </div>
-      <button class="btn btn-primary" onclick="saveKeys()">Save Keys</button>
-      <button class="btn btn-secondary" id="syncBtn" onclick="syncDiscogs()">Sync Full Discogs Collection & Wantlist</button>
+      <button type="button" class="btn btn-primary" id="saveKeysBtn">Save Keys</button>
+      <button type="button" class="btn btn-secondary" id="syncBtn">Sync Full Discogs Collection & Wantlist</button>
       <div class="status" id="syncStatus" style="margin-top:10px; margin-bottom:0;">Keys are stored locally on your phone only.</div>
     </div>
   </div>
@@ -134,37 +141,30 @@
   <canvas id="canvas"></canvas>
 
   <script>
-    const video = document.getElementById('video');
-    const previewImg = document.getElementById('previewImg');
-    const canvas = document.getElementById('canvas');
-    const snapBtn = document.getElementById('snapBtn');
-    const resetCamBtn = document.getElementById('resetCamBtn');
-    const reticle = document.getElementById('reticle');
-    const reticleCenter = document.getElementById('reticleCenter');
-    const statusBox = document.getElementById('statusBox');
+    var video = document.getElementById('video');
+    var previewImg = document.getElementById('previewImg');
+    var camPlaceholder = document.getElementById('camPlaceholder');
+    var canvas = document.getElementById('canvas');
+    var liveCamBtn = document.getElementById('liveCamBtn');
+    var snapBtn = document.getElementById('snapBtn');
+    var statusBox = document.getElementById('statusBox');
 
-    let stream = null;
-    let cameraReady = false;
-    let currentImageBase64 = null;
+    var stream = null;
+    var cameraReady = false;
+    var archiveData = { collection: [], wantlist: [] };
 
-    let archiveData = JSON.parse(localStorage.getItem('crate_archive') || '{"collection":[],"wantlist":[]}');
+    try {
+      archiveData = JSON.parse(localStorage.getItem('crate_archive') || '{"collection":[],"wantlist":[]}');
+    } catch (e) {}
+
+    function updateBadge() {
+      var c = archiveData.collection ? archiveData.collection.length : 0;
+      var w = archiveData.wantlist ? archiveData.wantlist.length : 0;
+      document.getElementById('archiveBadge').textContent = 'Archive: ' + c + ' | Want: ' + w;
+    }
+
     updateBadge();
 
     document.getElementById('geminiKey').value = localStorage.getItem('crate_gemini_key') || '';
     document.getElementById('discogsUser').value = localStorage.getItem('crate_discogs_user') || '';
-    document.getElementById('discogsToken').value = localStorage.getItem('crate_discogs_token') || '';
-
-    function switchTab(tab) {
-      document.getElementById('tabScan').classList.toggle('active', tab === 'scan');
-      document.getElementById('tabKeys').classList.toggle('active', tab === 'keys');
-      document.getElementById('panelScan').classList.toggle('active', tab === 'scan');
-      document.getElementById('panelKeys').classList.toggle('active', tab === 'keys');
-    }
-
-    function setStatus(msg, type = '') {
-      statusBox.textContent = msg;
-      statusBox.className = 'status' + (type ? ' ' + type : '');
-    }
-
-    function updateBadge() {
-      const c = archiveData.collection ? archiveData.collection.length : 0;
+    
