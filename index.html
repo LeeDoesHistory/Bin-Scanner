@@ -609,4 +609,107 @@
     const file = e.target.files[0];
     if (!file) return;
     const reader = new FileReader();
-    reader.onlo
+        reader.onload = function(ev) {
+      const img = new Image();
+      img.onload = async function() {
+        const canvas = document.getElementById("canvas");
+        const scale = Math.min(1, 1000 / Math.max(img.width, img.height));
+        canvas.width = Math.round(img.width * scale);
+        canvas.height = Math.round(img.height * scale);
+        const ctx = canvas.getContext("2d");
+        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+        const dataUrl = canvas.toDataURL("image/jpeg", 0.90);
+        showPreviewImage(dataUrl);
+        await analyzeBase64Image(dataUrl.split(",")[1]);
+      };
+      img.src = ev.target.result;
+    };
+    reader.readAsDataURL(file);
+  }
+
+  async function fetchAllPages(urlBase, token, statusEl, label) {
+    let page = 1;
+    let totalPages = 1;
+    let collected = [];
+
+    while (page <= totalPages) {
+      statusEl.textContent = `Syncing ${label}: page ${page} of ${totalPages}...`;
+      const sep = urlBase.includes("?") ? "&" : "?";
+      const res = await fetch(`${urlBase}${sep}page=${page}&per_page=100`, {
+        headers: {
+          "Authorization": `Discogs token=${token}`,
+          "User-Agent": "PersonalCrateScanner/1.0"
+        }
+      });
+      if (!res.ok) throw new Error(`Discogs HTTP ${res.status}`);
+      const data = await res.json();
+      totalPages = data.pagination ? data.pagination.pages : 1;
+      const list = data.releases || data.wants || [];
+      for (const item of list) {
+        const info = item.basic_information || {};
+        collected.push({
+          id: info.id,
+          title: info.title || "",
+          year: info.year || "",
+          artists: (info.artists || []).map(a => a.name).join(", "),
+          labels: (info.labels || []).map(l => `${l.name} ${l.catno}`).join(" | "),
+          catnos: (info.labels || []).map(l => (l.catno || "").toLowerCase().replace(/[^a-z0-9]/g, "")),
+          formats: (info.formats || []).map(f => f.name).join(", ")
+        });
+      }
+      page++;
+      await new Promise(r => setTimeout(r, 350));
+    }
+    return collected;
+  }
+
+  async function syncDiscogsCollection() {
+    saveSettings();
+    const user = localStorage.getItem("cs_discogsUser");
+    const token = localStorage.getItem("cs_discogsToken");
+    const statusEl = document.getElementById("syncStatus");
+    const btn = document.getElementById("syncBtn");
+
+    if (!user || !token) {
+      statusEl.textContent = "Enter both your Discogs Username and Personal Access Token first.";
+      return;
+    }
+
+    btn.disabled = true;
+    try {
+      archiveItems = await fetchAllPages(
+        `https://api.discogs.com/users/${encodeURIComponent(user)}/collection/folders/0/releases`,
+        token,
+        statusEl,
+        "Collection"
+      );
+      wantlistItems = await fetchAllPages(
+        `https://api.discogs.com/users/${encodeURIComponent(user)}/wants`,
+        token,
+        statusEl,
+        "Wantlist"
+      );
+      localStorage.setItem("cs_archive", JSON.stringify(archiveItems));
+      localStorage.setItem("cs_wantlist", JSON.stringify(wantlistItems));
+      updateBadge();
+      statusEl
+      
+    document.getElementById("resNotes").textContent = info.special_notes || "—";
+
+    const matchWrap = document.getElementById("matchDetailWrap");
+    if (archiveMatch) {
+      matchWrap.style.display = "block";
+      document.getElementById("resMatch").textContent = `${archiveMatch.artists} — ${archiveMatch.title} (${archiveMatch.labels})`;
+    } else {
+      matchWrap.style.display = "none";
+    }
+
+    const q = encodeURIComponent(`${info.label || ""} ${info.catalog_number || ""} ${info.artist || ""}`.trim());
+    document.getElementById("discogsLink").href = `https://www.discogs.com/search/?q=${q}&type=release`;
+    document.getElementById("resultCard").style.display = "block";
+  }
+
+  init();
+</script>
+</body>
+</html>
