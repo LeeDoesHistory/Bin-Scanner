@@ -16,7 +16,6 @@
     --blue: #2563eb;
     --blue-bright: #3b82f6;
     --green: #10b981;
-    --red: #ef4444;
   }
   * { box-sizing: border-box; }
   body {
@@ -52,18 +51,18 @@
   }
   .tabs, .mode-row {
     display: flex;
-    gap: 8px;
+    gap: 6px;
     margin-bottom: 10px;
   }
   .tab-btn, .mode-btn {
     flex: 1;
-    padding: 10px;
+    padding: 9px 6px;
     border-radius: 10px;
     border: 1px solid var(--border);
     background: var(--card);
     color: var(--muted);
     font-weight: 600;
-    font-size: 0.88rem;
+    font-size: 0.82rem;
     cursor: pointer;
   }
   .tab-btn.active {
@@ -93,7 +92,7 @@
     margin-top: 10px;
   }
   label:first-child { margin-top: 0; }
-  input[type="text"], input[type="password"] {
+  input[type="text"], input[type="password"], input[type="number"] {
     width: 100%;
     padding: 10px 12px;
     border-radius: 8px;
@@ -116,13 +115,13 @@
   }
   button.secondary {
     width: 100%;
-    padding: 11px;
+    padding: 10px;
     border-radius: 10px;
     border: 1px solid var(--blue-bright);
     background: var(--blue);
     color: var(--white);
     font-weight: 600;
-    font-size: 0.9rem;
+    font-size: 0.86rem;
     cursor: pointer;
     margin-top: 8px;
   }
@@ -148,7 +147,7 @@
     object-fit: cover;
     display: block;
   }
-  /* Silhouette Guides */
+  /* Viewfinder Silhouettes */
   .reticle-standard {
     position: absolute;
     inset: 12%;
@@ -187,6 +186,29 @@
     border: 2px dashed rgba(255, 255, 255, 0.95);
     border-radius: 50%;
   }
+  .reticle-matrix {
+    position: absolute;
+    top: 32%;
+    bottom: 32%;
+    left: 10%;
+    right: 10%;
+    border: 2px dashed rgba(255, 255, 255, 0.95);
+    border-radius: 16px;
+    pointer-events: none;
+    box-shadow: 0 0 0 999px rgba(15, 23, 42, 0.55);
+  }
+  .reticle-matrix::after {
+    content: "ALIGN RUNOUT / DEADWAX BAND HERE";
+    position: absolute;
+    bottom: -24px;
+    left: 0;
+    right: 0;
+    text-align: center;
+    font-size: 0.7rem;
+    font-weight: 700;
+    color: #93c5fd;
+    letter-spacing: 0.04em;
+  }
   .verdict {
     padding: 12px 14px;
     border-radius: 12px;
@@ -198,9 +220,393 @@
   .verdict.new { background: rgba(16, 185, 129, 0.18); border: 1px solid var(--green); color: #6ee7b7; }
   .verdict.owned { background: rgba(59, 130, 246, 0.22); border: 1px solid var(--blue-bright); color: #93c5fd; }
   .verdict.grail { background: rgba(255, 255, 255, 0.18); border: 1px solid var(--white); color: var(--white); }
-  .score-box {
+  .sub-box {
     background: #0f172a;
     border: 1px solid var(--border);
     border-radius: 10px;
-    padding: 10px 
-  
+    padding: 10px 12px;
+    margin-bottom: 10px;
+  }
+  .box-header {
+    display: flex;
+    justify-content: space-between;
+    font-weight: 700;
+    font-size: 0.88rem;
+    margin-bottom: 6px;
+    color: var(--white);
+  }
+  .score-bar-bg {
+    width: 100%;
+    height: 8px;
+    background: #334155;
+    border-radius: 999px;
+    overflow: hidden;
+    margin-bottom: 8px;
+  }
+  .score-bar-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #3b82f6, #ffffff);
+    width: 0%;
+    transition: width 0.4s ease;
+  }
+  .check-list {
+    margin: 0;
+    padding-left: 16px;
+    font-size: 0.82rem;
+    color: #cbd5e1;
+    line-height: 1.45;
+  }
+  .price-grid {
+    display: flex;
+    gap: 6px;
+    margin-top: 6px;
+  }
+  .price-pill {
+    flex: 1;
+    background: #1e293b;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 6px;
+    text-align: center;
+    font-size: 0.76rem;
+  }
+  .price-pill strong {
+    display: block;
+    color: #93c5fd;
+    font-size: 0.85rem;
+    margin-top: 2px;
+  }
+  .flag-pill {
+    display: inline-block;
+    background: rgba(59, 130, 246, 0.25);
+    border: 1px solid var(--blue-bright);
+    color: #bfdbfe;
+    padding: 3px 8px;
+    border-radius: 999px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    margin: 3px 4px 3px 0;
+  }
+  .meta-row {
+    font-size: 0.88rem;
+    margin: 6px 0;
+    line-height: 1.4;
+  }
+  .meta-row strong { color: var(--muted); font-weight: 600; }
+  .status-log {
+    font-size: 0.82rem;
+    color: var(--muted);
+    margin-top: 8px;
+    white-space: pre-wrap;
+  }
+  a.btn-link {
+    display: block;
+    text-align: center;
+    text-decoration: none;
+    padding: 11px;
+    border-radius: 10px;
+    background: var(--blue);
+    border: 1px solid var(--blue-bright);
+    color: var(--white);
+    font-weight: 600;
+    font-size: 0.9rem;
+    margin-top: 10px;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>Crate Scanner</h1>
+  <span class="badge" id="syncBadge">Archive: 0 | Want: 0</span>
+</header>
+
+<div class="tabs">
+  <button type="button" class="tab-btn active" id="tabScan" onclick="switchTab('scan')">Scan Label</button>
+  <button type="button" class="tab-btn" id="tabSetup" onclick="switchTab('setup')">Archive Sync &amp; Keys</button>
+</div>
+
+<!-- SCAN PANEL -->
+<div id="panel-scan" class="panel active">
+  <div class="mode-row">
+    <button type="button" class="mode-btn active" id="modeStd" onclick="setSizeMode('standard')">LP / 78 Label</button>
+    <button type="button" class="mode-btn" id="mode45" onclick="setSizeMode('45')">45 Single</button>
+    <button type="button" class="mode-btn" id="modeMatrix" onclick="setSizeMode('matrix')">Deadwax / Matrix</button>
+  </div>
+
+  <div class="camera-wrap">
+    <video id="video" autoplay playsinline muted></video>
+    <img id="previewImg" style="display:none;" alt="Captured label" />
+    <div class="reticle-standard" id="reticle"></div>
+  </div>
+
+  <button type="button" class="primary" id="snapBtn" onclick="captureAndScan()">Snap &amp; Identify</button>
+  <button type="button" class="secondary" id="liveBtn" style="display:none;" onclick="resetCamera()">Back to Live Camera</button>
+
+  <div class="btn-row">
+    <button type="button" class="secondary" onclick="openGallery()">Gallery</button>
+    <button type="button" class="secondary" id="torchBtn" onclick="toggleTorch()">Flashlight</button>
+    <button type="button" class="secondary" id="savePhotoBtn" style="display:none;" onclick="downloadCapturedPhoto()">Save Photo</button>
+  </div>
+
+  <input type="file" id="galleryInput" accept="image/*" style="display:none;" onchange="handleFileUpload(event)" />
+
+  <div class="status-log" id="scanStatus">Ready. Align label inside the silhouette and tap Snap.</div>
+
+  <div class="card" id="resultCard" style="display:none;">
+    <div id="verdictBanner" class="verdict new">NEW TO ARCHIVE</div>
+
+    <!-- Live Discogs Price + Shipping Box -->
+    <div class="sub-box" id="priceBox">
+      <div class="box-header">
+        <span>Discogs Landed Price (w/ Ship)</span>
+        <span id="priceHeadline">Checking...</span>
+      </div>
+      <div style="font-size:0.78rem; color:#94a3b8;" id="priceSubtext">Searching Discogs marketplace...</div>
+      <div class="price-grid" id="priceGrid" style="display:none;">
+        <div class="price-pill">VG + Ship<strong id="pVG">—</strong></div>
+        <div class="price-pill">VG+ + Ship<strong id="pVGP">—</strong></div>
+        <div class="price-pill">NM + Ship<strong id="pNM">—</strong></div>
+      </div>
+    </div>
+
+    <!-- Adaptive Interest Score -->
+    <div class="sub-box">
+      <div class="box-header">
+        <span>Archive Interest Score</span>
+        <span id="interestScoreText">0 / 100</span>
+      </div>
+      <div class="score-bar-bg">
+        <div class="score-bar-fill" id="interestScoreBar"></div>
+      </div>
+      <ul class="check-list" id="interestChecks"></ul>
+    </div>
+
+    <div id="flagsWrap" style="margin-bottom:8px;"></div>
+    <div class="meta-row"><strong>Artist:</strong> <span id="resArtist">—</span></div>
+    <div class="meta-row"><strong>Title:</strong> <span id="resTitle">—</span></div>
+    <div class="meta-row"><strong>Label &amp; Cat#:</strong> <span id="resCat">—</span></div>
+    <div class="meta-row"><strong>Matrix / Pressing:</strong> <span id="resMatrix">—</span></div>
+    <div class="meta-row"><strong>Format / Era:</strong> <span id="resFormat">—</span></div>
+    <div class="meta-row"><strong>Notes:</strong> <span id="resNotes">—</span></div>
+    <div class="meta-row" id="matchDetailWrap" style="display:none;"><strong>Archive Match:</strong> <span id="resMatch">—</span></div>
+    <a id="discogsLink" class="btn-link" href="#" target="_blank" rel="noopener">Open Listings on Discogs</a>
+  </div>
+</div>
+
+<!-- SETUP PANEL -->
+<div id="panel-setup" class="panel">
+  <div class="card">
+    <label for="geminiKey">Free Gemini API Key (Google AI Studio)</label>
+    <input type="password" id="geminiKey" placeholder="AIzaSy..." autocomplete="off" />
+
+    <label for="discogsUser">Discogs Username</label>
+    <input type="text" id="discogsUser" placeholder="YourDiscogsUsername" autocomplete="off" />
+
+    <label for="discogsToken">Discogs Personal Access Token</label>
+    <input type="password" id="discogsToken" placeholder="Your Discogs token..." autocomplete="off" />
+
+    <label for="shippingCost">Estimated Discogs Shipping Buffer ($ USD)</label>
+    <input type="number" id="shippingCost" step="0.50" value="6.00" />
+
+    <button type="button" class="primary" id="saveKeysBtn" onclick="saveSettings()">Save Keys &amp; Settings</button>
+    <button type="button" class="secondary" id="syncBtn" onclick="syncDiscogsCollection()">Sync Full Discogs Collection &amp; Wantlist</button>
+    <div class="status-log" id="syncStatus">Keys are stored locally on your phone only.</div>
+  </div>
+</div>
+
+<canvas id="canvas" style="display:none;"></canvas>
+
+<script>
+  let stream = null;
+  let torchOn = false;
+  let archiveItems = [];
+  let wantlistItems = [];
+  let lastCapturedDataUrl = "";
+  let sizeMode = "standard";
+
+  const GRAIL_CATS = ["11009", "11010", "11011", "A-808", "47-6325", "20-6325", "5358", "R-415", "5011", "R-5004"];
+  const PRIORITY_ARTISTS = ["johnny cash", "tommy cash", "marty robbins", "elton britt", "al bowlly", "sheldon allman", "frank sinatra", "buddy holly", "duane eddy", "bing crosby", "ink spots", "ella fitzgerald"];
+
+  function init() {
+    try {
+      document.getElementById("geminiKey").value = localStorage.getItem("cs_geminiKey") || "";
+      document.getElementById("discogsUser").value = localStorage.getItem("cs_discogsUser") || "";
+      document.getElementById("discogsToken").value = localStorage.getItem("cs_discogsToken") || "";
+      document.getElementById("shippingCost").value = localStorage.getItem("cs_shippingCost") || "6.00";
+      archiveItems = JSON.parse(localStorage.getItem("cs_archive") || "[]");
+      wantlistItems = JSON.parse(localStorage.getItem("cs_wantlist") || "[]");
+    } catch (e) {
+      archiveItems = [];
+      wantlistItems = [];
+    }
+    updateBadge();
+    startCamera();
+  }
+
+  function setSizeMode(mode) {
+    sizeMode = mode;
+    document.getElementById("modeStd").classList.toggle("active", mode === "standard");
+    document.getElementById("mode45").classList.toggle("active", mode === "45");
+    document.getElementById("modeMatrix").classList.toggle("active", mode === "matrix");
+    const reticle = document.getElementById("reticle");
+    if (mode === "45") reticle.className = "reticle-45";
+    else if (mode === "matrix") reticle.className = "reticle-matrix";
+    else reticle.className = "reticle-standard";
+  }
+
+  function updateBadge() {
+    document.getElementById("syncBadge").textContent = `Archive: ${archiveItems.length} | Want: ${wantlistItems.length}`;
+  }
+
+  function switchTab(tab) {
+    document.getElementById("tabScan").classList.toggle("active", tab === "scan");
+    document.getElementById("tabSetup").classList.toggle("active", tab === "setup");
+    document.getElementById("panel-scan").classList.toggle("active", tab === "scan");
+    document.getElementById("panel-setup").classList.toggle("active", tab === "setup");
+  }
+
+  function saveSettings() {
+    const statusEl = document.getElementById("syncStatus");
+    const btn = document.getElementById("saveKeysBtn");
+    try {
+      localStorage.setItem("cs_geminiKey", document.getElementById("geminiKey").value.trim());
+      localStorage.setItem("cs_discogsUser", document.getElementById("discogsUser").value.trim());
+      localStorage.setItem("cs_discogsToken", document.getElementById("discogsToken").value.trim());
+      localStorage.setItem("cs_shippingCost", document.getElementById("shippingCost").value || "6.00");
+
+      statusEl.style.color = "#6ee7b7";
+      statusEl.textContent = "Saved locally on this device.";
+      if (btn) {
+        btn.textContent = "Saved ✓";
+        setTimeout(() => { btn.textContent = "Save Keys & Settings"; }, 1500);
+      }
+    } catch (err) {
+      statusEl.style.color = "#ef4444";
+      statusEl.textContent = `Save error: ${err.message}`;
+    }
+  }
+
+  async function startCamera() {
+    const video = document.getElementById("video");
+    const preview = document.getElementById("previewImg");
+    const reticle = document.getElementById("reticle");
+    const statusEl = document.getElementById("scanStatus");
+
+    try {
+      if (stream) {
+        stream.getTracks().forEach(t => t.stop());
+        stream = null;
+        torchOn = false;
+      }
+      stream = await navigator.mediaDevices.getUserMedia({
+        video: { facingMode: { ideal: "environment" }, width: { ideal: 1280 }, height: { ideal: 1280 } },
+        audio: false
+      });
+      video.srcObject = stream;
+      await video.play();
+      video.style.display = "block";
+      reticle.style.display = "block";
+      preview.style.display = "none";
+      document.getElementById("snapBtn").style.display = "block";
+      document.getElementById("liveBtn").style.display = "none";
+      statusEl.textContent = "Live camera active. Align inside the silhouette and tap Snap.";
+    } catch (err) {
+      video.style.display = "none";
+      reticle.style.display = "none";
+      document.getElementById("liveBtn").style.display = "block";
+      statusEl.textContent = "Live camera unavailable. Tap 'Gallery' to pick a photo.";
+    }
+  }
+
+  async function toggleTorch() {
+    if (!stream) return;
+    const track = stream.getVideoTracks()[0];
+    if (!track) return;
+    try {
+      torchOn = !torchOn;
+      await track.applyConstraints({ advanced: [{ torch: torchOn }] });
+      document.getElementById("torchBtn").textContent = torchOn ? "Flashlight ON" : "Flashlight";
+    } catch (e) {
+      document.getElementById("scanStatus").textContent = "Flashlight toggle not supported on this browser.";
+    }
+  }
+
+  function resetCamera() {
+    lastCapturedDataUrl = "";
+    document.getElementById("savePhotoBtn").style.display = "none";
+    document.getElementById("resultCard").style.display = "none";
+    document.getElementById("galleryInput").value = "";
+    startCamera();
+  }
+
+  function openGallery() {
+    const input = document.getElementById("galleryInput");
+    input.value = "";
+    input.click();
+  }
+
+  function downloadCapturedPhoto() {
+    if (!lastCapturedDataUrl) return;
+    const link = document.createElement("a");
+    link.href = lastCapturedDataUrl;
+    link.download = `record-${sizeMode}-${Date.now()}.jpg`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  }
+
+  function showPreviewImage(dataUrl) {
+    lastCapturedDataUrl = dataUrl;
+    const preview = document.getElementById("previewImg");
+    preview.src = dataUrl;
+    preview.style.display = "block";
+    document.getElementById("video").style.display = "none";
+    document.getElementById("reticle").style.display = "none";
+    document.getElementById("snapBtn").style.display = "none";
+    document.getElementById("liveBtn").style.display = "block";
+    document.getElementById("savePhotoBtn").style.display = "block";
+  }
+
+  async function captureAndScan() {
+    const video = document.getElementById("video");
+    const canvas = document.getElementById("canvas");
+
+    if (!video.videoWidth) {
+      document.getElementById("scanStatus").textContent = "Camera stream not ready. Tap 'Gallery' or wait 1 second.";
+      return;
+    }
+
+    const baseSize = Math.min(video.videoWidth, video.videoHeight);
+    const ctx = canvas.getContext("2d");
+
+    if (sizeMode === "matrix") {
+      const cropW = baseSize * 0.85;
+      const cropH = baseSize * 0.42;
+      const sx = (video.videoWidth - cropW) / 2;
+      const sy = (video.videoHeight - cropH) / 2;
+      canvas.width = 1000;
+      canvas.height = 500;
+      ctx.filter = "contrast(1.35) grayscale(0.4)";
+      ctx.drawImage(video, sx, sy, cropW, cropH, 0, 0, 1000, 500);
+      ctx.filter = "none";
+    } else {
+      const cropFactor = sizeMode === "45" ? 0.72 : 0.88;
+      const cropSize = baseSize * cropFactor;
+      const sx = (video.videoWidth - cropSize) / 2;
+      const sy = (video.videoHeight - cropSize) / 2;
+      canvas.width = 900;
+      canvas.height = 900;
+      ctx.drawImage(video, sx, sy, cropSize, cropSize, 0, 0, 900, 900);
+    }
+
+    const dataUrl = canvas.toDataURL("image/jpeg", 0.90);
+    showPreviewImage(dataUrl);
+    await analyzeBase64Image(dataUrl.split(",")[1]);
+  }
+
+  function handleFileUpload(e) {
+    const file = e.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onlo
