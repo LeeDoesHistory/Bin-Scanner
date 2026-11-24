@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-<title>Crate Scanner — Vinyl & 78 Archive Tool</title>
+<title>Crate Scanner — Vinyl &amp; 78 Archive Tool</title>
 <style>
   :root {
     --bg: #0f172a;
@@ -11,10 +11,10 @@
     --border: #334155;
     --text: #f8fafc;
     --muted: #94a3b8;
-    --accent: #ffffff;
-    --accent-text: #0f172a;
-    --blue: #3b82f6;
-    --blue-hover: #2563eb;
+    --white: #ffffff;
+    --white-text: #0f172a;
+    --blue: #2563eb;
+    --blue-bright: #3b82f6;
     --green: #10b981;
     --red: #ef4444;
   }
@@ -39,22 +39,23 @@
   header h1 {
     font-size: 1.15rem;
     margin: 0;
-    letter-spacing: 0.3px;
+    color: var(--white);
   }
   .badge {
     font-size: 0.75rem;
-    padding: 4px 8px;
+    padding: 4px 10px;
     border-radius: 999px;
     background: var(--card);
-    border: 1px solid var(--border);
-    color: var(--muted);
+    border: 1px solid var(--blue-bright);
+    color: #93c5fd;
+    font-weight: 600;
   }
-  .tabs {
+  .tabs, .mode-row {
     display: flex;
     gap: 8px;
-    margin-bottom: 12px;
+    margin-bottom: 10px;
   }
-  .tab-btn {
+  .tab-btn, .mode-btn {
     flex: 1;
     padding: 10px;
     border-radius: 10px;
@@ -62,13 +63,18 @@
     background: var(--card);
     color: var(--muted);
     font-weight: 600;
-    font-size: 0.9rem;
+    font-size: 0.88rem;
     cursor: pointer;
   }
   .tab-btn.active {
-    background: var(--accent);
-    color: var(--accent-text);
-    border-color: var(--accent);
+    background: var(--white);
+    color: var(--white-text);
+    border-color: var(--white);
+  }
+  .mode-btn.active {
+    background: var(--blue);
+    color: var(--white);
+    border-color: var(--blue-bright);
   }
   .panel { display: none; }
   .panel.active { display: block; }
@@ -96,47 +102,37 @@
     color: var(--text);
     font-size: 0.95rem;
   }
-  /* White & Blue Button Theme */
   button.primary {
     width: 100%;
     padding: 14px;
     border-radius: 12px;
     border: none;
-    background: var(--accent);
-    color: var(--accent-text);
+    background: var(--white);
+    color: var(--white-text);
     font-weight: 700;
     font-size: 1rem;
     cursor: pointer;
     margin-top: 10px;
-    box-shadow: 0 4px 12px rgba(255, 255, 255, 0.15);
   }
-  button.primary:hover { background: #e2e8f0; }
-
   button.secondary {
     width: 100%;
     padding: 11px;
     border-radius: 10px;
-    border: 1px solid var(--border);
+    border: 1px solid var(--blue-bright);
     background: var(--blue);
-    color: #ffffff;
+    color: var(--white);
     font-weight: 600;
     font-size: 0.9rem;
     cursor: pointer;
     margin-top: 8px;
   }
-  button.secondary:hover { background: var(--blue-hover); }
-  
   button:disabled { opacity: 0.5; cursor: not-allowed; }
-
   .btn-row {
     display: flex;
     gap: 8px;
     margin-top: 8px;
   }
-  .btn-row button {
-    margin-top: 0;
-    flex: 1;
-  }
+  .btn-row button { margin-top: 0; flex: 1; }
   .camera-wrap {
     position: relative;
     width: 100%;
@@ -152,12 +148,44 @@
     object-fit: cover;
     display: block;
   }
-  .reticle {
+  /* Silhouette Guides */
+  .reticle-standard {
     position: absolute;
-    inset: 14%;
-    border: 2px dashed rgba(255, 255, 255, 0.75);
+    inset: 12%;
+    border: 2px dashed rgba(255, 255, 255, 0.85);
     border-radius: 50%;
     pointer-events: none;
+    box-shadow: 0 0 0 999px rgba(15, 23, 42, 0.35);
+  }
+  .reticle-standard::after {
+    content: "";
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 14px;
+    height: 14px;
+    transform: translate(-50%, -50%);
+    border: 2px solid rgba(255, 255, 255, 0.9);
+    border-radius: 50%;
+  }
+  .reticle-45 {
+    position: absolute;
+    inset: 18%;
+    border: 2px dashed rgba(96, 165, 250, 0.95);
+    border-radius: 50%;
+    pointer-events: none;
+    box-shadow: 0 0 0 999px rgba(15, 23, 42, 0.45);
+  }
+  .reticle-45::after {
+    content: "";
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 34%;
+    height: 34%;
+    transform: translate(-50%, -50%);
+    border: 2px dashed rgba(255, 255, 255, 0.95);
+    border-radius: 50%;
   }
   .verdict {
     padding: 12px 14px;
@@ -168,6 +196,11 @@
     text-align: center;
   }
   .verdict.new { background: rgba(16, 185, 129, 0.18); border: 1px solid var(--green); color: #6ee7b7; }
-  .verdict.owned { background: rgba(59, 130, 246, 0.18); border: 1px solid var(--blue); color: #93c5fd; }
-  .ver
+  .verdict.owned { background: rgba(59, 130, 246, 0.22); border: 1px solid var(--blue-bright); color: #93c5fd; }
+  .verdict.grail { background: rgba(255, 255, 255, 0.18); border: 1px solid var(--white); color: var(--white); }
+  .score-box {
+    background: #0f172a;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 10px 
   
